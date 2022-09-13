@@ -33,13 +33,12 @@ suspend fun Context.createVideoCaptureUseCase(
     previewView: PreviewView
 ): VideoCapture<Recorder> {
     val preview = Preview.Builder()
-//        .setTargetResolution(Constants.VIDEO_SIZE)
         .build()
         .apply { setSurfaceProvider(previewView.surfaceProvider) }
 
     val qualitySelector = QualitySelector.from(
-        Quality.SD,
-        FallbackStrategy.lowerQualityOrHigherThan(Quality.SD)
+        Quality.FHD,
+        FallbackStrategy.lowerQualityOrHigherThan(Quality.FHD)
     )
     val recorder = Recorder.Builder()
         .setExecutor(mainExecutor)
