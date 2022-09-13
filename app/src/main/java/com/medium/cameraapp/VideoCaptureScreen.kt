@@ -62,13 +62,11 @@ fun VideoCaptureScreen(
     }
 
     LaunchedEffect(previewView) {
-        lifecycleOwner.lifecycleScope.launch {
-            videoCapture.value = context.createVideoCaptureUseCase(
-                lifecycleOwner = lifecycleOwner,
-                cameraSelector = cameraSelector.value,
-                previewView = previewView
-            )
-        }
+        videoCapture.value = context.createVideoCaptureUseCase(
+            lifecycleOwner = lifecycleOwner,
+            cameraSelector = cameraSelector.value,
+            previewView = previewView
+        )
     }
     PermissionsRequired(
         multiplePermissionsState = permissionState,
