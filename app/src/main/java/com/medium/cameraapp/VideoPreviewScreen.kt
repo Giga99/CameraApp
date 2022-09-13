@@ -1,8 +1,10 @@
 package com.medium.cameraapp
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,16 +26,22 @@ fun VideoPreviewScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        AndroidView(
-            factory = { context ->
-                StyledPlayerView(context).apply {
-                    player = exoPlayer
-                }
-            },
+    DisposableEffect(
+        Box(
             modifier = Modifier.fillMaxSize()
-        )
+        ) {
+            AndroidView(
+                factory = { context ->
+                    StyledPlayerView(context).apply {
+                        player = exoPlayer
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    ) {
+        onDispose {
+            exoPlayer.release()
+        }
     }
 }
