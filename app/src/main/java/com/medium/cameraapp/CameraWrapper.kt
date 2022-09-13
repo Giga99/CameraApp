@@ -29,12 +29,13 @@ suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutin
 
 suspend fun Context.createVideoCaptureUseCase(
     lifecycleOwner: LifecycleOwner,
+    cameraSelector: CameraSelector,
     previewView: PreviewView
 ): VideoCapture<Recorder> {
     val preview = Preview.Builder()
 //        .setTargetResolution(Constants.VIDEO_SIZE)
         .build()
-        .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+        .apply { setSurfaceProvider(previewView.surfaceProvider) }
 
     val qualitySelector = QualitySelector.from(
         Quality.SD,
@@ -50,7 +51,7 @@ suspend fun Context.createVideoCaptureUseCase(
     cameraProvider.unbindAll()
     cameraProvider.bindToLifecycle(
         lifecycleOwner,
-        CameraSelector.DEFAULT_FRONT_CAMERA,
+        cameraSelector,
         preview,
         videoCapture
     )

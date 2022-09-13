@@ -1,6 +1,8 @@
 package com.medium.cameraapp
 
 import android.Manifest
+import android.net.Uri
+import androidx.camera.core.CameraSelector
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
@@ -46,32 +48,38 @@ fun VideoCaptureScreen(
     )
 
     var recording: Recording? = remember { null }
+    val previewView: MutableState<PreviewView> = remember { mutableStateOf(PreviewView(context)) }
     val videoCapture: MutableState<VideoCapture<Recorder>?> = remember { mutableStateOf(null) }
     val recordingStarted: MutableState<Boolean> = remember { mutableStateOf(false) }
 
     val audioEnabled: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val cameraSelector: MutableState<CameraSelector> = remember {
+        mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA)
+    }
 
     LaunchedEffect(Unit) {
         permissionState.launchMultiplePermissionRequest()
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
+    LaunchedEffect(previewView.value) {
+        lifecycleOwner.lifecycleScope.launch {
+            videoCapture.value = context.createVideoCaptureUseCase(
+                lifecycleOwner = lifecycleOwner,
+                cameraSelector = cameraSelector.value,
+                previewView = previewView.value
+            )
+        }
+    }
+    PermissionsRequired(
+        multiplePermissionsState = permissionState,
+        permissionsNotGrantedContent = { /* ... */ },
+        permissionsNotAvailableContent = { /* ... */ }
     ) {
-        PermissionsRequired(
-            multiplePermissionsState = permissionState,
-            permissionsNotGrantedContent = { /* ... */ },
-            permissionsNotAvailableContent = { /* ... */ }
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
             AndroidView(
-                factory = { context ->
-                    PreviewView(context).also { previewView ->
-                        lifecycleOwner.lifecycleScope.launch {
-                            videoCapture.value =
-                                context.createVideoCaptureUseCase(lifecycleOwner, previewView)
-                        }
-                    }
-                },
+                factory = { previewView.value },
                 modifier = Modifier.fillMaxSize()
             )
             IconButton(
@@ -92,11 +100,14 @@ fun VideoCaptureScreen(
                                 audioEnabled = audioEnabled.value
                             ) { event ->
                                 if (event is VideoRecordEvent.Finalize) {
-                                    val uri = URLEncoder.encode(
-                                        event.outputResults.outputUri.toString(),
-                                        StandardCharsets.UTF_8.toString()
-                                    )
-                                    navController.navigate("${Route.VIDEO_PREVIEW}/$uri")
+                                    val uri = event.outputResults.outputUri
+                                    if (uri != Uri.EMPTY) {
+                                        val uriEncoded = URLEncoder.encode(
+                                            uri.toString(),
+                                            StandardCharsets.UTF_8.toString()
+                                        )
+                                        navController.navigate("${Route.VIDEO_PREVIEW}/$uriEncoded")
+                                    }
                                 }
                             }
                         }
@@ -120,11 +131,39 @@ fun VideoCaptureScreen(
                     onClick = {
                         audioEnabled.value = !audioEnabled.value
                     },
-                    modifier = Modifier.align(Alignment.BottomStart)
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(bottom = 32.dp)
                 ) {
                     Icon(
                         painter = painterResource(if (audioEnabled.value) R.drawable.ic_mic_on else R.drawable.ic_mic_off),
-                        contentDescription = ""
+                        contentDescription = "",
+                        modifier = Modifier.size(64.dp)
+                    )
+                }
+            }
+            if (!recordingStarted.value) {
+                IconButton(
+                    onClick = {
+                        cameraSelector.value =
+                            if (cameraSelector.value == CameraSelector.DEFAULT_BACK_CAMERA) CameraSelector.DEFAULT_FRONT_CAMERA
+                            else CameraSelector.DEFAULT_BACK_CAMERA
+                        lifecycleOwner.lifecycleScope.launch {
+                            videoCapture.value = context.createVideoCaptureUseCase(
+                                lifecycleOwner = lifecycleOwner,
+                                cameraSelector = cameraSelector.value,
+                                previewView = previewView.value
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_switch_camera),
+                        contentDescription = "",
+                        modifier = Modifier.size(64.dp)
                     )
                 }
             }
