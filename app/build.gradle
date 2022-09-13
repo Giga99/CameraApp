@@ -67,4 +67,10 @@ dependencies {
     implementation "androidx.camera:camera-video:$cameraxVersion"
     implementation "androidx.camera:camera-view:$cameraxVersion"
     implementation "androidx.camera:camera-extensions:$cameraxVersion"
+
+    // Accompanist
+    implementation "com.google.accompanist:accompanist-permissions:$accompanistPermissionsVersion"
+
+    //Exo Player Library
+    implementation "com.google.android.exoplayer:exoplayer:$exoPlayerVersion"
 }

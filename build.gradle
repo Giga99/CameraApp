@@ -4,6 +4,12 @@ buildscript {
 
         // CameraX
         cameraxVersion = '1.2.0-beta01'
+
+        // Accompanist
+        accompanistPermissionsVersion = '0.23.1'
+
+        // ExoPlayer
+        exoPlayerVersion = '2.18.1'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

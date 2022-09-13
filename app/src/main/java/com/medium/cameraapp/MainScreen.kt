@@ -18,7 +18,7 @@ fun MainScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(30.dp),
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onClick = { navController.navigate(Route.IMAGE) }) {
