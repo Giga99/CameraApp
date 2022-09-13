@@ -48,7 +48,7 @@ fun VideoCaptureScreen(
     )
 
     var recording: Recording? = remember { null }
-    val previewView: MutableState<PreviewView> = remember { mutableStateOf(PreviewView(context)) }
+    val previewView: PreviewView = remember { PreviewView(context) }
     val videoCapture: MutableState<VideoCapture<Recorder>?> = remember { mutableStateOf(null) }
     val recordingStarted: MutableState<Boolean> = remember { mutableStateOf(false) }
 
@@ -61,12 +61,12 @@ fun VideoCaptureScreen(
         permissionState.launchMultiplePermissionRequest()
     }
 
-    LaunchedEffect(previewView.value) {
+    LaunchedEffect(previewView) {
         lifecycleOwner.lifecycleScope.launch {
             videoCapture.value = context.createVideoCaptureUseCase(
                 lifecycleOwner = lifecycleOwner,
                 cameraSelector = cameraSelector.value,
-                previewView = previewView.value
+                previewView = previewView
             )
         }
     }
@@ -79,7 +79,7 @@ fun VideoCaptureScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             AndroidView(
-                factory = { previewView.value },
+                factory = { previewView },
                 modifier = Modifier.fillMaxSize()
             )
             IconButton(
@@ -152,7 +152,7 @@ fun VideoCaptureScreen(
                             videoCapture.value = context.createVideoCaptureUseCase(
                                 lifecycleOwner = lifecycleOwner,
                                 cameraSelector = cameraSelector.value,
-                                previewView = previewView.value
+                                previewView = previewView
                             )
                         }
                     },
