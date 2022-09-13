@@ -70,6 +70,6 @@ dependencies {
     // Accompanist
     implementation "com.google.accompanist:accompanist-permissions:$accompanistPermissionsVersion"
 
-    //Exo Player Library
+    //ExoPlayer Library
     implementation "com.google.android.exoplayer:exoplayer:$exoPlayerVersion"
 }
